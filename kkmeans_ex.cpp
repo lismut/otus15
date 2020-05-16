@@ -72,10 +72,6 @@ int main(int argc, char* argv[])
 
     sample_type m;
 
-    //dlib::rand rnd;
-
-    // we will read sample points for teaching
-    const long num = 50;
     std::ifstream sampleFile(argv[2]);
     std::string sampleLine;
     while(sampleFile >> sampleLine) {
@@ -101,30 +97,6 @@ int main(int argc, char* argv[])
     // now run the k-means algorithm on our set of samples.  
     test.train(samples,initial_centers);
 
-    /*// now loop over all our samples and print out their predicted class.  In this example
-    // all points are correctly identified.
-    for (unsigned long i = 0; i < samples.size()/number_of_clusters; ++i)
-    {
-        cout << test(samples[i]) << " ";
-        cout << test(samples[i+num]) << " ";
-        cout << test(samples[i+2*num]) << "\n";
-    }*/
-
-    /*// Now print out how many dictionary vectors each center used.  Note that
-    // the maximum number of 8 was reached.  If you went back to the kcentroid 
-    // constructor and changed the 8 to some bigger number you would see that these
-    // numbers would go up.  However, 8 is all we need to correctly cluster this dataset.
-    cout << "num dictionary vectors for center 0: " << test.get_kcentroid(0).dictionary_size() << endl;
-    cout << "num dictionary vectors for center 1: " << test.get_kcentroid(1).dictionary_size() << endl;
-    cout << "num dictionary vectors for center 2: " << test.get_kcentroid(2).dictionary_size() << endl;
-*/
-
-    // Finally, we can also solve the same kind of non-linear clustering problem with
-    // spectral_cluster().  The output is a vector that indicates which cluster each sample
-    // belongs to.  Just like with kkmeans, it assigns each point to the correct cluster.
-  /*  std::vector<unsigned long> assignments = spectral_cluster(kernel_type(0.1), samples, number_of_clusters);
-    cout << mat(assignments) << endl;
-*/
     std::string one;
     std::vector<std::string> vec_res;
     std::unordered_map<int, int> counters;
@@ -132,7 +104,7 @@ int main(int argc, char* argv[])
         try {
             double x = atof(one.substr(0, one.find(';')).c_str());
             double y = atof(one.substr(one.find(';') + 1, one.size() - one.find(';')).c_str());
-            int cluster = test({x, y});
+            unsigned long cluster = test({x, y});
             std::string res = to_string(x) + ";" + to_string(y) + ";" + to_string(cluster);
             counters[cluster]++;
             vec_res.emplace_back(res);
