@@ -9,10 +9,7 @@ endif()
 find_package(BLAS REQUIRED)
 
 add_executable(kkmeans kkmeans_ex.cpp)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/sample.txt
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/diagram.py
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 set_target_properties(kkmeans PROPERTIES
         CXX_STANDARD 14
         CXX_STANDARD_REQUIRED ON
@@ -34,7 +31,8 @@ else ()
 endif()
 
 install(TARGETS kkmeans RUNTIME DESTINATION bin)
-
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/sample.txt DESTINATION bin)
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/diagram.py DESTINATION bin)
 set(CPACK_GENERATOR DEB)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
