@@ -23,10 +23,7 @@
 #include <iostream>
 #include <vector>
 #include<unordered_map>
-#include <fstream>
-
 #include <dlib/clustering.h>
-#include <dlib/rand.h>
 
 using namespace std;
 using namespace dlib;
@@ -62,7 +59,7 @@ int main(int argc, char* argv[])
     // maximum number of dictionary vectors a kcentroid is allowed to use.  So you can use
     // it to control the runtime complexity.  
     kcentroid<kernel_type> kc(kernel_type(0.001),0.006, 200/(number_of_clusters*8));
-    
+
     // Now we make an instance of the kkmeans object and tell it to use kcentroid objects
     // that are configured with the parameters from the kc object we defined above.
     kkmeans<kernel_type> test(kc);
@@ -79,8 +76,8 @@ int main(int argc, char* argv[])
             m(0) = atof(sampleLine.substr(0, sampleLine.find(';')).c_str());
             m(1) = atof(sampleLine.substr(sampleLine.find(';') + 1, sampleLine.size() - sampleLine.find(';')).c_str());
             samples.push_back(m);
-        } catch(...) {
-            std::cout << "Error in parsing sample data";
+        } catch(const std::exception& ex) {
+            std::cout << "Error in parsing sample data " << ex.what();
             return 1;
         }
     }
@@ -108,8 +105,8 @@ int main(int argc, char* argv[])
             std::string res = to_string(x) + ";" + to_string(y) + ";" + to_string(cluster);
             counters[cluster]++;
             vec_res.emplace_back(res);
-        } catch(...) {
-            std::cout << "Error in parsing test data";
+        } catch(const std::exception& ex) {
+            std::cout << "Error in parsing test data " << ex.what();
             return 1;
         }
     }
