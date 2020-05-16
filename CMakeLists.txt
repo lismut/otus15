@@ -7,7 +7,7 @@ find_package(BLAS REQUIRED)
 add_executable(kkmeans kkmeans_ex.cpp)
 
 set_target_properties(kkmeans PROPERTIES
-        CXX_STANDARD 14
+        CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
         )
 
