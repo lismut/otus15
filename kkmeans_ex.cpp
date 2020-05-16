@@ -61,8 +61,8 @@ int main(int argc, char* argv[])
     // (and thus run slower and use more memory).  The third argument, however, is the 
     // maximum number of dictionary vectors a kcentroid is allowed to use.  So you can use
     // it to control the runtime complexity.  
-    //kcentroid<kernel_type> kc(kernel_type(0.001),0.006, 200/(number_of_clusters*8));
-    kcentroid<kernel_type> kc(kernel_type(1),6, 200/(number_of_clusters*8));
+    kcentroid<kernel_type> kc(kernel_type(0.001),0.006, 200/(number_of_clusters*8));
+    
     // Now we make an instance of the kkmeans object and tell it to use kcentroid objects
     // that are configured with the parameters from the kc object we defined above.
     kkmeans<kernel_type> test(kc);
