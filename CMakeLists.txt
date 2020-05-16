@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(31.DlibClustering)
+if($ENV{TRAVIS_BUILD_NUMBER})
+    project(DlibClustering VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+else()
+    project(DlibClustering)
+endif()
 
 find_package(BLAS REQUIRED)
 
