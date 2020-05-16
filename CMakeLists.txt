@@ -31,6 +31,8 @@ else ()
 endif()
 
 install(TARGETS kkmeans RUNTIME DESTINATION bin)
+install(TARGETS diagram.py RUNTIME DESTINATION bin)
+install(TARGETS sample.txt RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
 
