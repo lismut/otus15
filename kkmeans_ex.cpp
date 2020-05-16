@@ -22,6 +22,8 @@
 
 #include <iostream>
 #include <vector>
+#include<unordered_map>
+#include <fstream>
 
 #include <dlib/clustering.h>
 #include <dlib/rand.h>
@@ -29,8 +31,16 @@
 using namespace std;
 using namespace dlib;
 
-int main()
+int main(int argc, char* argv[])
 {
+    bool print = true;
+    if (argc != 3 && argc != 4) {
+        std::cout << "Usage:" << std::endl;
+        std::cout << "\tkkmeans number_of_clusters sample_file <flag_tofile>";
+        return 0;
+    } else if (argc == 4) print = false;
+
+    int number_of_clusters = atoi(argv[1]);
     // Here we declare that our samples will be 2 dimensional column vectors.  
     // (Note that if you don't know the dimensionality of your vectors at compile time
     // you can change the 2 to a 0 and then set the size at runtime)
@@ -51,7 +61,7 @@ int main()
     // (and thus run slower and use more memory).  The third argument, however, is the 
     // maximum number of dictionary vectors a kcentroid is allowed to use.  So you can use
     // it to control the runtime complexity.  
-    kcentroid<kernel_type> kc(kernel_type(0.1),0.01, 8);
+    kcentroid<kernel_type> kc(kernel_type(0.001),0.006, 200/(number_of_clusters*8));
 
     // Now we make an instance of the kkmeans object and tell it to use kcentroid objects
     // that are configured with the parameters from the kc object we defined above.
@@ -62,93 +72,85 @@ int main()
 
     sample_type m;
 
-    dlib::rand rnd;
+    //dlib::rand rnd;
 
-    // we will make 50 points from each class
+    // we will read sample points for teaching
     const long num = 50;
-
-    // make some samples near the origin
-    double radius = 0.5;
-    for (long i = 0; i < num; ++i)
-    {
-        double sign = 1;
-        if (rnd.get_random_double() < 0.5)
-            sign = -1;
-        m(0) = 2*radius*rnd.get_random_double()-radius;
-        m(1) = sign*sqrt(radius*radius - m(0)*m(0));
-
-        // add this sample to our set of samples we will run k-means 
-        samples.push_back(m);
-    }
-
-    // make some samples in a circle around the origin but far away
-    radius = 10.0;
-    for (long i = 0; i < num; ++i)
-    {
-        double sign = 1;
-        if (rnd.get_random_double() < 0.5)
-            sign = -1;
-        m(0) = 2*radius*rnd.get_random_double()-radius;
-        m(1) = sign*sqrt(radius*radius - m(0)*m(0));
-
-        // add this sample to our set of samples we will run k-means 
-        samples.push_back(m);
-    }
-
-    // make some samples in a circle around the point (25,25) 
-    radius = 4.0;
-    for (long i = 0; i < num; ++i)
-    {
-        double sign = 1;
-        if (rnd.get_random_double() < 0.5)
-            sign = -1;
-        m(0) = 2*radius*rnd.get_random_double()-radius;
-        m(1) = sign*sqrt(radius*radius - m(0)*m(0));
-
-        // translate this point away from the origin
-        m(0) += 25;
-        m(1) += 25;
-
-        // add this sample to our set of samples we will run k-means 
-        samples.push_back(m);
+    std::ifstream sampleFile(argv[2]);
+    std::string sampleLine;
+    while(sampleFile >> sampleLine) {
+        try {
+            m(0) = atof(sampleLine.substr(0, sampleLine.find(';')).c_str());
+            m(1) = atof(sampleLine.substr(sampleLine.find(';') + 1, sampleLine.size() - sampleLine.find(';')).c_str());
+            samples.push_back(m);
+        } catch(...) {
+            std::cout << "Error in parsing sample data";
+            return 1;
+        }
     }
 
     // tell the kkmeans object we made that we want to run k-means with k set to 3. 
     // (i.e. we want 3 clusters)
-    test.set_number_of_centers(3);
+    test.set_number_of_centers(number_of_clusters);
 
     // You need to pick some initial centers for the k-means algorithm.  So here
     // we will use the dlib::pick_initial_centers() function which tries to find
     // n points that are far apart (basically).  
-    pick_initial_centers(3, initial_centers, samples, test.get_kernel());
+    pick_initial_centers(number_of_clusters, initial_centers, samples, test.get_kernel());
 
     // now run the k-means algorithm on our set of samples.  
     test.train(samples,initial_centers);
 
-    // now loop over all our samples and print out their predicted class.  In this example
+    /*// now loop over all our samples and print out their predicted class.  In this example
     // all points are correctly identified.
-    for (unsigned long i = 0; i < samples.size()/3; ++i)
+    for (unsigned long i = 0; i < samples.size()/number_of_clusters; ++i)
     {
         cout << test(samples[i]) << " ";
         cout << test(samples[i+num]) << " ";
         cout << test(samples[i+2*num]) << "\n";
-    }
+    }*/
 
-    // Now print out how many dictionary vectors each center used.  Note that 
+    /*// Now print out how many dictionary vectors each center used.  Note that
     // the maximum number of 8 was reached.  If you went back to the kcentroid 
     // constructor and changed the 8 to some bigger number you would see that these
     // numbers would go up.  However, 8 is all we need to correctly cluster this dataset.
     cout << "num dictionary vectors for center 0: " << test.get_kcentroid(0).dictionary_size() << endl;
     cout << "num dictionary vectors for center 1: " << test.get_kcentroid(1).dictionary_size() << endl;
     cout << "num dictionary vectors for center 2: " << test.get_kcentroid(2).dictionary_size() << endl;
-
+*/
 
     // Finally, we can also solve the same kind of non-linear clustering problem with
     // spectral_cluster().  The output is a vector that indicates which cluster each sample
     // belongs to.  Just like with kkmeans, it assigns each point to the correct cluster.
-    std::vector<unsigned long> assignments = spectral_cluster(kernel_type(0.1), samples, 3);
+  /*  std::vector<unsigned long> assignments = spectral_cluster(kernel_type(0.1), samples, number_of_clusters);
     cout << mat(assignments) << endl;
-
+*/
+    std::string one;
+    std::vector<std::string> vec_res;
+    std::unordered_map<int, int> counters;
+    while(std::cin >> one) {
+        try {
+            double x = atof(one.substr(0, one.find(';')).c_str());
+            double y = atof(one.substr(one.find(';') + 1, one.size() - one.find(';')).c_str());
+            int cluster = test({x, y});
+            std::string res = to_string(x) + ";" + to_string(y) + ";" + to_string(cluster);
+            counters[cluster]++;
+            vec_res.emplace_back(res);
+        } catch(...) {
+            std::cout << "Error in parsing test data";
+            return 1;
+        }
+    }
+    if (print) {
+        for (const auto& a : vec_res)
+            std::cout << a << std::endl;
+    } else {
+        std::ofstream fileO("./results.txt");
+        fileO << counters.size() << std::endl;
+        for (const auto& a : counters)
+            fileO << a.first << " " << a.second << std::endl;
+        fileO.close();
+    }
 }
 
 
