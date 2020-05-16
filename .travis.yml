@@ -5,13 +5,11 @@ before_script:
 - sudo apt-get update -qq
 - sudo apt-get -qq install libdlib-dev
 - sudo apt-get -qq install python-pip
-- pip3 install matplotlib
 - sudo apt-get -qq install libopenblas-dev
 script:
 - cmake .
 - cmake --build .
 - cmake --build . --target package
-- python3 ./diagram.py
 deploy:
   - provider: script
     skip_cleanup: true
