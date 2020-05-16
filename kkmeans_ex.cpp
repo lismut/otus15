@@ -99,9 +99,12 @@ int main(int argc, char* argv[])
     std::unordered_map<int, int> counters;
     while(std::cin >> one) {
         try {
+            sample_type sample;
             double x = atof(one.substr(0, one.find(';')).c_str());
             double y = atof(one.substr(one.find(';') + 1, one.size() - one.find(';')).c_str());
-            unsigned long cluster = test({x, y});
+            sample(0) = x;
+            sample(1) = y;
+            unsigned long cluster = test(sample);
             std::string res = to_string(x) + ";" + to_string(y) + ";" + to_string(cluster);
             counters[cluster]++;
             vec_res.emplace_back(res);
